@@ -1,5 +1,6 @@
 #ifndef __MSMB_PPROC_H
 #define __MSMB_PPROC_H
+#define MSM_OUTPUT_BUF_CNT 8
 
 #include <uapi/media/msmb_pproc.h>
 #include <linux/compat.h>
