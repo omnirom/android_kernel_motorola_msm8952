@@ -1758,7 +1758,7 @@ update_window_start(struct rq *rq, u64 wallclock)
 	int nr_windows;
 
 	delta = wallclock - rq->window_start;
-	BUG_ON(delta < 0);
+	WARN_ON(delta < 0);
 	if (delta < sched_ravg_window)
 		return;
 
