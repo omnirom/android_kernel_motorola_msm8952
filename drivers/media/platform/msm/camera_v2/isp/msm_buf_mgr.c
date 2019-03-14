@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -53,13 +53,13 @@ static int msm_buf_check_head_sanity(struct msm_isp_bufq *bufq)
 	next = bufq->head.next;
 
 	if (prev->next != &bufq->head) {
-		pr_err("%s: Error! head prev->next is %pK should be %pK\n",
+		pr_err("%s: Error! head prev->next is %p should be %p\n",
 			__func__, prev->next, &bufq->head);
 		return -EINVAL;
 	}
 
 	if (next->prev != &bufq->head) {
-		pr_err("%s: Error! head next->prev is %pK should be %pK\n",
+		pr_err("%s: Error! head next->prev is %p should be %p\n",
 			__func__, next->prev, &bufq->head);
 		return -EINVAL;
 	}
@@ -68,13 +68,13 @@ static int msm_buf_check_head_sanity(struct msm_isp_bufq *bufq)
 	next = bufq->share_head.next;
 
 	if (prev->next != &bufq->share_head) {
-		pr_err("%s: Error! share_head prev->next is %pK should be %pK\n",
+		pr_err("%s: Error! share_head prev->next is %p should be %p\n",
 			__func__, prev->next, &bufq->share_head);
 		return -EINVAL;
 	}
 
 	if (next->prev != &bufq->share_head) {
-		pr_err("%s: Error! share_head next->prev is %pK should be %pK\n",
+		pr_err("%s: Error! share_head next->prev is %p should be %p\n",
 			__func__, next->prev, &bufq->share_head);
 		return -EINVAL;
 	}
@@ -90,8 +90,7 @@ struct msm_isp_bufq *msm_isp_get_bufq(
 	uint32_t bufq_index = bufq_handle & 0xFF;
 
 	if ((bufq_handle == 0) ||
-		(bufq_index >= buf_mgr->num_buf_q) ||
-		(bufq_index >= BUF_MGR_NUM_BUF_Q))
+		(bufq_index > buf_mgr->num_buf_q))
 		return NULL;
 
 	bufq = &buf_mgr->bufq[bufq_index];
@@ -213,8 +212,8 @@ static int msm_isp_prepare_isp_buf(struct msm_isp_buf_mgr *buf_mgr,
 		}
 		mapped_info->paddr += accu_length;
 		accu_length += qbuf_buf->planes[i].length;
-		CDBG("%s: plane: %d addr:%pK\n",
-			__func__, i, (void *)mapped_info->paddr);
+		CDBG("%s: plane: %d addr:%lu\n",
+			__func__, i, (unsigned long)mapped_info->paddr);
 
 	}
 	buf_info->num_planes = qbuf_buf->num_planes;
@@ -259,7 +258,7 @@ static int msm_isp_map_buf(struct msm_isp_buf_mgr *buf_mgr,
 	int iommu_hdl;
 
 	if (!buf_mgr || !mapped_info) {
-		pr_err_ratelimited("%s: %d] NULL ptr buf_mgr %pK mapped_info %pK\n",
+		pr_err_ratelimited("%s: %d] NULL ptr buf_mgr %p mapped_info %p\n",
 			__func__, __LINE__, buf_mgr, mapped_info);
 		return -EINVAL;
 	}
@@ -280,8 +279,8 @@ static int msm_isp_map_buf(struct msm_isp_buf_mgr *buf_mgr,
 		pr_err_ratelimited("%s: cannot map address", __func__);
 		goto smmu_map_error;
 	}
-	CDBG("%s: addr:%pK\n",
-		__func__, (void *)mapped_info->paddr);
+	CDBG("%s: addr:%lu\n",
+		__func__, (unsigned long)mapped_info->paddr);
 
 	return rc;
 smmu_map_error:
@@ -1415,8 +1414,7 @@ static int msm_isp_buf_mgr_debug(struct msm_isp_buf_mgr *buf_mgr)
 	struct msm_isp_buffer *bufs = NULL;
 	uint32_t i = 0, j = 0, k = 0, rc = 0;
 	char *print_buf = NULL, temp_buf[100];
-	uint32_t print_buf_size = 2000;
-	unsigned long start_addr = 0, end_addr = 0;
+	uint32_t start_addr = 0, end_addr = 0, print_buf_size = 2000;
 	if (!buf_mgr) {
 		pr_err_ratelimited("%s: %d] NULL buf_mgr\n",
 			__func__, __LINE__);
@@ -1451,8 +1449,8 @@ static int msm_isp_buf_mgr_debug(struct msm_isp_buf_mgr *buf_mgr)
 					end_addr = bufs->mapped_info[k].paddr +
 						bufs->mapped_info[k].len;
 					snprintf(temp_buf, sizeof(temp_buf),
-						" buf %d plane %d start_addr %pK end_addr %pK\n",
-						j, k, (void *)start_addr, (void *)end_addr);
+						" buf %d plane %d start_addr %x end_addr %x\n",
+						j, k, start_addr, end_addr);
 					strlcat(print_buf, temp_buf,
 						print_buf_size);
 				}
