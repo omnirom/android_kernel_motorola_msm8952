@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -289,6 +289,21 @@
 #define CFG_ENABLE_DYNAMIC_RA_START_RATE_MIN     (0)
 #define CFG_ENABLE_DYNAMIC_RA_START_RATE_MAX     (65535)
 #define CFG_ENABLE_DYNAMIC_RA_START_RATE_DEFAULT (0)
+
+/*
+ * gEnableRTTsupport
+ *
+ * @Min: 0 - Disabled
+ * @Max: 1 - Enabled
+ * @Default: 1 - Enabled
+ *
+ * The param is used to enable/disable support for RTT
+ */
+
+#define CFG_ENABLE_RTT_SUPPORT            "gEnableRTTSupport"
+#define CFG_ENABLE_RTT_SUPPORT_DEFAULT    (1)
+#define CFG_ENABLE_RTT_SUPPORT_MIN        (0)
+#define CFG_ENABLE_RTT_SUPPORT_MAX        (1)
 
 /* Bit mask value to enable RTS/CTS for different modes
  * for 2.4 GHz, HT20 - 0x0001, for 2.4 GHz, HT40 - 0x0002
@@ -931,7 +946,7 @@ typedef enum
  * Max: Max rate for 1x1 transmission
  */
 #define CFG_PER_ROAM_SCAN_RATE_UP_THRESHOLD           "gPERRoamUpThresholdRate"
-#define CFG_PER_ROAM_SCAN_RATE_UP_THRESHOLD_MIN       (20)
+#define CFG_PER_ROAM_SCAN_RATE_UP_THRESHOLD_MIN       (10)
 #define CFG_PER_ROAM_SCAN_RATE_UP_THRESHOLD_MAX       (3330)
 #define CFG_PER_ROAM_SCAN_RATE_UP_THRESHOLD_DEFAULT   (400)
 
@@ -950,13 +965,13 @@ typedef enum
  * Value : seconds
  */
 #define CFG_PER_ROAM_SCAN_WAIT_TIME                   "gPERRoamScanInterval"
-#define CFG_PER_ROAM_SCAN_WAIT_TIME_MIN               (10)
+#define CFG_PER_ROAM_SCAN_WAIT_TIME_MIN               (0)
 #define CFG_PER_ROAM_SCAN_WAIT_TIME_MAX               (3600)
 #define CFG_PER_ROAM_SCAN_WAIT_TIME_DEFAULT           (300)
 
 /* Time to collect stats to trigger roam scan for Tx path */
 #define CFG_PER_ROAM_SCAN_PER_TIME_THRESHOLD          "gPERRoamStatsTime"
-#define CFG_PER_ROAM_SCAN_PER_TIME_THRESHOLD_MIN      (5)
+#define CFG_PER_ROAM_SCAN_PER_TIME_THRESHOLD_MIN      (0)
 #define CFG_PER_ROAM_SCAN_PER_TIME_THRESHOLD_MAX      (25)
 #define CFG_PER_ROAM_SCAN_PER_TIME_THRESHOLD_DEFAULT  (10)
 
@@ -2871,10 +2886,23 @@ This feature requires the dependent cfg.ini "gRoamPrefer5GHz" set to 1 */
 #define CFG_SAP_PROBE_RESP_OFFLOAD_MAX     (1)
 #define CFG_SAP_PROBE_RESP_OFFLOAD_DEFAULT (1)
 
-#define CFG_CH_AVOID_SAP_RESTART_NAME    "sap_ch_avoid_restart"
-#define CFG_CH_AVOID_SAP_RESTART_MIN     (0)
-#define CFG_CH_AVOID_SAP_RESTART_MAX     (1)
-#define CFG_CH_AVOID_SAP_RESTART_DEFAULT (1)
+#define CFG_SAP_INTERNAL_RESTART_NAME    "gEnableSapInternalRestart"
+#define CFG_SAP_INTERNAL_RESTART_MIN     (0)
+#define CFG_SAP_INTERNAL_RESTART_MAX     (1)
+#define CFG_SAP_INTERNAL_RESTART_DEFAULT (1)
+
+/*
+ * gDisableScanDuringSco is used to disable/enable scan during SCO call
+ * This can be useful to avoid glitches because of EXIT_IMPS invoked by scan
+ * when SCO call in progress
+ * 0: Enable scan
+ * 1: Disable scan
+ */
+#define CFG_DISABLE_SCAN_DURING_SCO         "gDisableScanDuringSco"
+#define CFG_DISABLE_SCAN_DURING_SCO_MIN     (0)
+#define CFG_DISABLE_SCAN_DURING_SCO_MAX     (1)
+#define CFG_DISABLE_SCAN_DURING_SCO_DEFAULT (0)
+
 
 /*--------------------------------------------------------------------------- 
   Type declarations
@@ -3436,7 +3464,9 @@ typedef struct
    uint32_t                    edca_be_aifs;
    v_BOOL_t                    sendMgmtPktViaWQ5;
    v_BOOL_t                    sap_probe_resp_offload;
-   v_BOOL_t                    sap_restrt_ch_avoid;
+   v_BOOL_t                    sap_internal_restart;
+   v_BOOL_t                    disable_scan_during_sco;
+   uint8_t                     enable_rtt_support;
 } hdd_config_t;
 
 /*--------------------------------------------------------------------------- 
