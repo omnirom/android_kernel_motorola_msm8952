@@ -2470,12 +2470,16 @@ dec_nr_big_small_task(struct hmp_sched_stats *stats, struct task_struct *p)
 	if (!sched_enable_hmp || sched_disable_window_stats)
 		return;
 
-	if (is_big_task(p))
+	if (is_big_task(p)) {
 		stats->nr_big_tasks--;
-	else if (is_small_task(p))
+		if (stats->nr_big_tasks < 0)
+			stats->nr_big_tasks = 0;
+	}
+	else if (is_small_task(p)) {
 		stats->nr_small_tasks--;
-
-	BUG_ON(stats->nr_big_tasks < 0 || stats->nr_small_tasks < 0);
+		if (stats->nr_small_tasks < 0)
+			stats->nr_small_tasks = 0;
+	}
 }
 
 static void
